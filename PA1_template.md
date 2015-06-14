@@ -1,11 +1,6 @@
----
-title: 'Reproducible Research: Peer Assessment 1'
-author: "Himanshu Shrotri"
-date: "14 June 2015"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Himanshu Shrotri  
+14 June 2015  
 
 ## Summary
 
@@ -17,14 +12,7 @@ The assessment will perform analysis of this data and answers below four questio
 - Imputing missing values
 - Are there differences in activity patterns between weekdays and weekends?
 
-```{r varDeclare, echo = FALSE}
-# Initialize Variables related to project working directory and related files
-currDir     <- getwd()
-newDir      <- paste(currDir,"/NEI_data",sep = "")
-zipFileUrl  <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
-zipFile     <- "activity.zip"
-dataFile    <- "activity.csv"
-```
+
 
 ## Loading and processing the data
 The data is provided in a .csv file. This code will do the following:
@@ -33,7 +21,8 @@ The data is provided in a .csv file. This code will do the following:
 - Unzip the file and create the file *activity.csv*
 - Read the data in a variable for further processing
 
-```{r prcsData, echo = TRUE}
+
+```r
 # Check if text data file exists, if not then download the zip file and unzip file.
 if (!file.exists(dataFile)) {
         print("Project data missing; downloading from source. Please Wait...")
@@ -54,7 +43,8 @@ This piece of code will perform the following:
 - Plot a histogram of steps per day (I will use 12 breaks for better readability).
 - Display *Mean* and *Median* of the data
 
-```{r questionOne, echo=TRUE}
+
+```r
 # Find out total number of steps per day
 stepsByDate <- aggregate(steps ~ date, activityData, sum, na.rm = TRUE)
 meanSteps <- mean(stepsByDate$steps)
@@ -69,14 +59,17 @@ with(stepsByDate, hist(x = steps
 abline(v = meanSteps, col="blue", lwd=2)
 ```
 
-Mean Steps are `r meanSteps` and Median Steps are `r medianSteps`
+![](PA1_template_files/figure-html/questionOne-1.png) 
+
+Mean Steps are 1.0766189\times 10^{4} and Median Steps are 10765
 
 ## What is the average daily activity pattern?
 This piece of code will perform the following:
 - Make a time series plot of the 5-minute interval and the average number of steps taken (y-axis)
 - Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r questionTwo, echo=TRUE}
+
+```r
 # Find out total number of steps per day
 intervalData <- aggregate(steps ~ interval, activityData, mean, na.rm = TRUE)
 intWithMaxSteps <- intervalData[order(intervalData$steps, decreasing = TRUE),][1,]$interval
@@ -92,21 +85,25 @@ points(intWithMaxSteps, maxSteps, col="red")
 text(intWithMaxSteps+200, maxSteps, col="red", labels = "Max Steps")
 ```
 
-There are `r maxSteps` steps for interval `r intWithMaxSteps`.
+![](PA1_template_files/figure-html/questionTwo-1.png) 
+
+There are 206.17 steps for interval 835.
 
 ## Imputing missing values
 This piece of code will perform the following:
 - Make a time series plot of the 5-minute interval and the average number of steps taken (y-axis)
 - Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r questionThreeOne, echo=TRUE}
+
+```r
 # Number of observations with NAs
 naObservations <- nrow(activityData[!complete.cases(activityData),])
 ```
 
-The provided data contains a total of `r naObservations` which are having NAs. Below is the brief on strategy proposed to fill in all the missing values in the dataset. I am using an imputing strategy to replace all NAs with average of steps for that interval.
+The provided data contains a total of 2304 which are having NAs. Below is the brief on strategy proposed to fill in all the missing values in the dataset. I am using an imputing strategy to replace all NAs with average of steps for that interval.
 
-```{r questionThreeTwo, echo=TRUE}
+
+```r
 # imputed steps will be avg of steps by interval
 intervalData$imputed_steps <- ceiling(intervalData$steps)
 
@@ -132,10 +129,11 @@ with(imputedIntervalData, plot(x = interval, y = steps
 
 points(intWithMaxSteps_imputed, maxStep_imputed, col="red")
 text(intWithMaxSteps_imputed+200, maxStep_imputed, col="red", labels = "Max Steps")
-
 ```
 
-There are `r maxStep_imputed` steps for interval `r intWithMaxSteps_imputed`.
+![](PA1_template_files/figure-html/questionThreeTwo-1.png) 
+
+There are 206.28 steps for interval 835.
 
 The impact of imputing the number of steps has a nigligible effect. By the two plots it is clear that missing values have very little bias.
 
@@ -145,7 +143,8 @@ This piece of code will perform the following:
 - Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
 
 
-```{r questionFour, echo = TRUE}
+
+```r
 imputedActivityData$weeks <- factor(
   ifelse(weekdays(as.Date(imputedActivityData$date)) %in% c("Saturday", "Sunday"),
          'weekend', 'weekday'))
@@ -160,14 +159,19 @@ with(weekdayIntervalData, plot(x = interval, y = steps
                  , xlab = "Intervals"
                  , ylab = "Steps (Imputed)"
                  , type = "l"))
+```
 
+![](PA1_template_files/figure-html/questionFour-1.png) 
+
+```r
 with(weekendIntervalData, plot(x = interval, y = steps
                  , main = "Average Steps per Interval (Weekend)"
                  , xlab = "Intervals"
                  , ylab = "Steps (Imputed)"
                  , type = "l"))
-
 ```
+
+![](PA1_template_files/figure-html/questionFour-2.png) 
 
 
 From above it is observed that on weekends there is less activity overall than weekdays.
